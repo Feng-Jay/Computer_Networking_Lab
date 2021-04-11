@@ -27,8 +27,8 @@ int main()
 
     cout<<"Sever is ready to response!!!"<<endl;
 
-    char recv_buf[50];
-    char send_buf[50];
+    char recv_buf[50];//接受缓冲区
+    char send_buf[50];//发送缓冲区
     int recv_num;
     int send_num;
     struct sockaddr_in client_addr;
