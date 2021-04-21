@@ -28,7 +28,7 @@ fn main()
                         let message=String::from_utf8(message).expect("Fail to give utf8 message!");
                         println!("Accept {}'s message: {}",address,message);
                         sender.send(message).expect("Fail to send message to receiver!");
-                    }
+                    },
                     Err(ref err) if err.kind()==ErrorKind::WouldBlock=>(),//若阻塞则match到Err结果
                     Err(_)=>{//处理错误
                         println!("{}'s connection down",address);
