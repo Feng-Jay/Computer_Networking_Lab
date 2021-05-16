@@ -1,8 +1,9 @@
 use std::fs;
 use std::io::prelude::*;
 use crate::MESSAGE_SIZE;
-use audio::{SAMPLE_RATE,Audio};
+// use audio::{SAMPLE_RATE,Audio};
 use std::str::FromStr;
+use chat_room::{SAMPLE_RATE,Audio};
 use crate::client::Client;
 use chat_room::{MTP,FTP,VTP,rename_filename};
 

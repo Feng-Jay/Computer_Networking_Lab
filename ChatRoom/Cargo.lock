@@ -23,13 +23,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "audio"
-version = "0.1.0"
-dependencies = [
- "alsa",
-]
-
-[[package]]
 name = "bitflags"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -51,7 +44,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 name = "chat_room"
 version = "0.1.0"
 dependencies = [
- "audio",
+ "alsa",
 ]
 
 [[package]]

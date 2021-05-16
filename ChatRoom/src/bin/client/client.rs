@@ -5,11 +5,12 @@ use std::time::Duration;
 use std::thread;
 use std::str;
 use super::*;
-use audio::{Audio, SAMPLE_RATE};
+// use audio::{Audio, SAMPLE_RATE};
+use chat_room::{SAMPLE_RATE,Audio};
 use chat_room::Protocol;
 
 pub struct Client{
-    addr:&'static str
+    addr:&'static str 
 }
 impl Client{
     pub fn new(add:&'static str)->Self{
