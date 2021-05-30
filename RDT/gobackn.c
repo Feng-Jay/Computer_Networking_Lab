@@ -73,7 +73,7 @@ void A_output(struct msg message)
     printf("\n");
     Asend_PKT.checksum+=Asend_PKT.seqnum;
     Asend_PKT.checksum+=Asend_PKT.acknum;
-    //copy校验和
+
     if(nextseqnum<base+WINDOWSIZE){
         //如果还可以发送，就将其存储起来，然后发送
         Acopy_PKT[nextseqnum%WINDOWSIZE]=Asend_PKT;
@@ -105,7 +105,7 @@ void A_input(struct pkt packet)
   judge+=packet.acknum;
   judge+=packet.seqnum;
   if(judge!=packet.checksum||packet.acknum==NAK){
-    printf("A recv NAK from B\n");
+    printf("A recv NAK from B or It is corrupt!\n");
     tolayer3(0,Acopy_PKT[base%WINDOWSIZE]);
     starttimer(0,12);
   }else{
