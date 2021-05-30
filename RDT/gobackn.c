@@ -18,6 +18,9 @@
 
 #define BIDIRECTIONAL 0    /* change to 1 if you're doing extra credit */
                            /* and write a routine called B_output */
+#define WINDOWSIZE 8
+#define ACK 1
+#define NAK 0
 
 /* a "msg" is the data unit passed from layer 5 (teachers code) to layer  */
 /* 4 (students' code).  It contains the data (characters) to be delivered */
@@ -48,24 +51,21 @@ void generate_next_arrival();
 float jimsrand();
 void init();
 
+int nextseqnum;
+int base;
+
 /* called from layer 5, passed the data to be sent to other side */
+struct pkt Acopy_PKT[WINDOWSIZE];
 struct pkt Asend_PKT;
-struct pkt Acopy_PKT;
-int Aseqnum;  
 void A_output(struct msg message)
 {
     //初始化，将A要发送的包中payload值设置为message的值
-    //copy数据
     memcpy(Asend_PKT.payload,message.data,sizeof(char)*20);
-    memcpy(Acopy_PKT.payload,message.data,sizeof(char)*20);
-    Asend_PKT.seqnum=Aseqnum;
-    Asend_PKT.acknum=Aseqnum;
-    //copy序列号与ACK
-    Acopy_PKT.seqnum=Aseqnum;
-    Acopy_PKT.acknum=Aseqnum;
+    Asend_PKT.seqnum=nextseqnum;
+    Asend_PKT.acknum=nextseqnum;
     //计算校验和
     Asend_PKT.checksum=0;
-    printf("A send to B:");
+    printf("A send to B:");//for debug
     for(int i=0;i<20;i++){
       Asend_PKT.checksum+=Asend_PKT.payload[i];
       printf("%c",Asend_PKT.payload[i]);
@@ -74,10 +74,18 @@ void A_output(struct msg message)
     Asend_PKT.checksum+=Asend_PKT.seqnum;
     Asend_PKT.checksum+=Asend_PKT.acknum;
     //copy校验和
-    Acopy_PKT.checksum=Asend_PKT.checksum;
-    //一切准备就绪，通过网络层发向B
-    tolayer3(0,Asend_PKT);
-    starttimer(0,10);//同时开始计时。
+    if(nextseqnum<base+WINDOWSIZE){
+        //如果还可以发送，就将其存储起来，然后发送
+        Acopy_PKT[nextseqnum%WINDOWSIZE]=Asend_PKT;
+        tolayer3(0,Asend_PKT);
+        if(base==nextseqnum) starttimer(0,10);
+
+        nextseqnum++;
+    }else{
+        //窗口满的情况下是不会继续发的
+        printf("Windows is full, please come later!\n");
+    }
+    return ;
 }
 
 void B_output(struct msg message)  /* need be completed only for extra credit */
@@ -88,32 +96,35 @@ void B_output(struct msg message)  /* need be completed only for extra credit */
 /* called from layer 3, when a packet arrives for layer 4 */
 void A_input(struct pkt packet)
 {
-  stoptimer(0);
   printf("A recvied B's response\n");
+  //开始判断校验和
   int judge=0;
   for(int i=0;i<20;i++){
     judge+=packet.payload[i];
   }
   judge+=packet.acknum;
   judge+=packet.seqnum;
-  if(judge!=packet.checksum||packet.acknum!=Aseqnum){
+  if(judge!=packet.checksum||packet.acknum==NAK){
     printf("A recv NAK from B\n");
-    tolayer3(0,Acopy_PKT);
+    tolayer3(0,Acopy_PKT[base%WINDOWSIZE]);
     starttimer(0,12);
   }else{
-    Aseqnum=(Aseqnum+1)%2;//rdt3.0中仍只需要0,1两个序列号
-    struct msg message;
-    memcpy(message.data,packet.payload,sizeof(char)*20);
-    tolayer5(1,message.data);
+    base=packet.seqnum+1;
+    if(base==nextseqnum){
+        stoptimer(0);
+    }
   }
 }
 
 /* called when A's timer goes off */
 void A_timerinterrupt()
 {
-  // printf("start timer\n");
-  tolayer3(0,Asend_PKT);
+  // printf("start timer\n")
   starttimer(0,12);
+  for(int i=base;i<nextseqnum;i++){
+      tolayer3(0,Acopy_PKT[i%WINDOWSIZE]);
+  }
+  return ;
 }  
 
 /* the following routine will be called once (only) before any other */
@@ -121,7 +132,8 @@ void A_timerinterrupt()
 void A_init()
 {
   printf("A init!\n");
-  Aseqnum=0;
+  base=0;
+  nextseqnum=0;
   return;
 }
 
@@ -146,10 +158,10 @@ void B_input(struct pkt packet)
   memset(Bsend_PKT.payload,0,sizeof(char)*20);
 
   if(judge!=packet.checksum||packet.seqnum!=expect_b){
-    //B接收的数据损坏，或者出现冗余，则不向上传递，向A发送ACK
+    //B接收的数据损坏，或者出现冗余，则不向上传递，向A发送NAK
     printf("B recv error pkt\n");
-    Bsend_PKT.acknum=(expect_b+1)%2;
-    Bsend_PKT.seqnum=(expect_b+1)%2;
+    Bsend_PKT.acknum=NAK;
+    Bsend_PKT.seqnum=expect_b;
     //计算校验和
     Bsend_PKT.checksum=0;
     for(int i=0;i<20;i++){
@@ -164,8 +176,8 @@ void B_input(struct pkt packet)
     memcpy(Brecv_MSG.data,packet.payload,sizeof(char)*20);
     tolayer5(1,Brecv_MSG.data);
     //开始准备向A发回ACK
-    Bsend_PKT.acknum=expect_b;
-    Bsend_PKT.seqnum=expect_b;
+    Bsend_PKT.acknum=ACK;
+    Bsend_PKT.seqnum=packet.seqnum;
     //计算校验和
     Bsend_PKT.checksum=0;
     for(int i=0;i<20;i++){
@@ -174,7 +186,7 @@ void B_input(struct pkt packet)
     Bsend_PKT.checksum+=Bsend_PKT.acknum;
     Bsend_PKT.checksum+=Bsend_PKT.seqnum;
     //完毕，准备发送
-    expect_b=(1+expect_b)%2;//每次都要重新计算B现在需要哪个数据包
+    expect_b++;//每次都要重新计算B现在需要哪个数据包
     tolayer3(1,Bsend_PKT);
   }
 }
