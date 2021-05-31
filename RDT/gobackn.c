@@ -78,7 +78,7 @@ void A_output(struct msg message)
         //如果还可以发送，就将其存储起来，然后发送
         Acopy_PKT[nextseqnum%WINDOWSIZE]=Asend_PKT;
         tolayer3(0,Asend_PKT);
-        if(base==nextseqnum) starttimer(0,10);
+        if(base==nextseqnum) starttimer(0,150);
 
         nextseqnum++;
     }else{
@@ -107,7 +107,7 @@ void A_input(struct pkt packet)
   if(judge!=packet.checksum||packet.acknum==NAK){
     printf("A recv NAK from B or It is corrupt!\n");
     tolayer3(0,Acopy_PKT[base%WINDOWSIZE]);
-    starttimer(0,12);
+    starttimer(0,150);
   }else{
     base=packet.seqnum+1;
     if(base==nextseqnum){
@@ -120,7 +120,7 @@ void A_input(struct pkt packet)
 void A_timerinterrupt()
 {
   // printf("start timer\n")
-  starttimer(0,12);
+  starttimer(0,150);
   for(int i=base;i<nextseqnum;i++){
       tolayer3(0,Acopy_PKT[i%WINDOWSIZE]);
   }
