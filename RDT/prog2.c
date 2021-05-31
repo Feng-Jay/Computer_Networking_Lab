@@ -77,7 +77,7 @@ void A_output(struct msg message)
     Acopy_PKT.checksum=Asend_PKT.checksum;
     //一切准备就绪，通过网络层发向B
     tolayer3(0,Asend_PKT);
-    starttimer(0,12);//同时开始计时。
+    starttimer(0,150);//同时开始计时。
 }
 
 void B_output(struct msg message)  /* need be completed only for extra credit */
@@ -97,11 +97,11 @@ void A_input(struct pkt packet)
   judge+=packet.acknum;
   judge+=packet.seqnum;
   if(judge!=packet.checksum||packet.acknum!=Aseqnum){
-    if(packet.acknum!=Aseqnum)
-    printf("A recv NAK from B\n");
-    else printf("A recv corrupt pkt!\n");
+    if(judge!=packet.checksum)
+    printf("A recv corrupt pkt!\n");
+    else printf("A recv NAK pkt!\n");
     tolayer3(0,Acopy_PKT);
-    starttimer(0,12);
+    starttimer(0,150);
   }else{
     Aseqnum=(Aseqnum+1)%2;//rdt3.0中仍只需要0,1两个序列号
     generate_next_arrival();  
@@ -116,7 +116,7 @@ void A_timerinterrupt()
 {
   // printf("start timer\n");
   tolayer3(0,Acopy_PKT);
-  starttimer(0,12);
+  starttimer(0,150);
 }  
 
 /* the following routine will be called once (only) before any other */
