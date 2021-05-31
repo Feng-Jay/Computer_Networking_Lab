@@ -105,7 +105,9 @@ void A_input(struct pkt packet)
   judge+=packet.acknum;
   judge+=packet.seqnum;
   if(judge!=packet.checksum||packet.acknum==NAK){
-    printf("A recv NAK from B or It is corrupt!\n");
+    if(judge!=packet.checksum)
+    printf("A recv corrupt pkt\n");
+    else printf("A recv NAK\n");
     tolayer3(0,Acopy_PKT[base%WINDOWSIZE]);
     starttimer(0,150);
   }else{
@@ -159,7 +161,9 @@ void B_input(struct pkt packet)
 
   if(judge!=packet.checksum||packet.seqnum!=expect_b){
     //B接收的数据损坏，或者出现冗余，则不向上传递，向A发送NAK
+    if(judge!=packet.checksum)
     printf("B recv error pkt\n");
+    else printf("B recv disorder pkt\n");
     Bsend_PKT.acknum=NAK;
     Bsend_PKT.seqnum=expect_b;
     //计算校验和
