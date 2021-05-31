@@ -77,7 +77,7 @@ void A_output(struct msg message)
     Acopy_PKT.checksum=Asend_PKT.checksum;
     //一切准备就绪，通过网络层发向B
     tolayer3(0,Asend_PKT);
-    starttimer(0,7);//同时开始计时。
+    starttimer(0,12);//同时开始计时。
 }
 
 void B_output(struct msg message)  /* need be completed only for extra credit */
@@ -97,11 +97,14 @@ void A_input(struct pkt packet)
   judge+=packet.acknum;
   judge+=packet.seqnum;
   if(judge!=packet.checksum||packet.acknum!=Aseqnum){
+    if(packet.acknum!=Aseqnum)
     printf("A recv NAK from B\n");
+    else printf("A recv corrupt pkt!\n");
     tolayer3(0,Acopy_PKT);
-    starttimer(0,7);
+    starttimer(0,12);
   }else{
     Aseqnum=(Aseqnum+1)%2;//rdt3.0中仍只需要0,1两个序列号
+    generate_next_arrival();  
     // struct msg message;
     // memcpy(message.data,packet.payload,sizeof(char)*20);
     // tolayer5(1,message.data);
@@ -113,7 +116,7 @@ void A_timerinterrupt()
 {
   // printf("start timer\n");
   tolayer3(0,Acopy_PKT);
-  starttimer(0,7);
+  starttimer(0,12);
 }  
 
 /* the following routine will be called once (only) before any other */
@@ -147,7 +150,9 @@ void B_input(struct pkt packet)
 
   if(judge!=packet.checksum||packet.seqnum!=expect_b){
     //B接收的数据损坏，或者出现冗余，则不向上传递，向A发送ACK
-    printf("B recv error pkt\n");
+    if(judge!=packet.checksum)
+    printf("B recv Corrupt pkt\n");
+    else printf("B recv disorder pkt\n");
     Bsend_PKT.acknum=(expect_b+1)%2;
     Bsend_PKT.seqnum=(expect_b+1)%2;
     //计算校验和
@@ -255,7 +260,7 @@ int main()
    A_init();
    B_init();
    
-   while (1) {
+  while(1){
         eventptr = evlist;            /* get next event to simulate */
         if (eventptr==NULL)
            goto terminate;
@@ -277,7 +282,7 @@ int main()
         if (nsim==nsimmax)
         break;                        /* all done with simulation */
         if (eventptr->evtype == FROM_LAYER5 ) {
-            generate_next_arrival();   /* set up future arrival */
+            // generate_next_arrival();   /* set up future arrival */
             /* fill in msg to give with string of same letter */    
             j = nsim % 26; 
             for (i=0; i<20; i++)  
