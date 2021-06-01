@@ -34,7 +34,7 @@ void rtinit0()
       pkt.sourceid=0;
       pkt.destid=i;//发送给1,2,3结点
       for(int j=0;j<4;j++){
-        pkt.mincost[j]=neighbors[j];
+        pkt.mincost[j]=dt0.costs[0][j];
       }
       tolayer2(pkt);
     }
@@ -43,7 +43,21 @@ void rtinit0()
 
 void rtupdate0(struct rtpkt *rcvdpkt)
 {
-  
+  int sourceid=rcvdpkt->sourceid;
+  for(int i=0;i<4;i++){
+    for(int j=0;j<4;j++){
+      dt0.costs[i][j]=min(dt0.costs[i][j],dt0.costs[i][sourceid]+rcvdpkt->mincost[j]);
+    }
+  }
+  for(int i=1;i<4;i++){//向node0的各个邻居发送初始化内容
+      struct rtpkt pkt;
+      pkt.sourceid=0;
+      pkt.destid=i;//将更新完的信息发送给1,2,3结点
+      for(int j=0;j<4;j++){
+        pkt.mincost[j]=dt0.costs[j];
+      }
+      tolayer2(pkt);
+    }
 }
 
 
@@ -66,6 +80,6 @@ void printdt0(struct distance_table *dtptr)
 /* constant definition in prog3.c from 0 to 1 */
 void linkhandler0(int linkid, int newcost)   
 {
-
+  neighbors[linkid]=newcost;
 }
 
