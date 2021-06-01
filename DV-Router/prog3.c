@@ -1,27 +1,4 @@
-#include <stdio.h>
-
-#define LINKCHANGES 1 
-/* ******************************************************************
-Programming assignment 3: implementing distributed, asynchronous,
-                          distance vector routing.
-
-THIS IS THE MAIN ROUTINE.  IT SHOULD NOT BE TOUCHED AT ALL BY STUDENTS!
-
-**********************************************************************/
-
-
-/* a rtpkt is the packet sent from one routing update process to
-   another via the call tolayer3() */
-struct rtpkt {
-  int sourceid;       /* id of sending router sending this pkt */
-  int destid;         /* id of router to which pkt being sent 
-                         (must be an immediate neighbor) */
-  int mincost[4];    /* min cost to node 0 ... 3 */
-  };
-
-int TRACE = 1;             /* for my debugging */
-int YES = 1;
-int NO = 0;
+#include <router.h>
 
 void creatertpkt(struct rtpkt *initrtpkt,int srcid,int destid,int mincosts[])
 {
@@ -55,7 +32,7 @@ struct event {
    struct rtpkt *rtpktptr; /* ptr to packet (if any) assoc w/ this event */
    struct event *prev;
    struct event *next;
- };
+};
 struct event *evlist = NULL;   /* the event list */
 
 /* possible events: */
@@ -189,8 +166,7 @@ float jimsrand()
 /*****************************************************/
  
 
-void insertevent(p)
-   struct event *p;
+void insertevent(struct event *p)
 {
    struct event *q,*qold;
 
@@ -239,9 +215,7 @@ void printevlist()
 
 
 /************************** TOLAYER2 ***************/
-tolayer2(packet)
-  struct rtpkt packet;
-  
+void tolayer2(struct rtpkt packet)
 {
  struct rtpkt *mypktptr;
  struct event *evptr, *q;

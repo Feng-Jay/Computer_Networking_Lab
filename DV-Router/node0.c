@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <router.h>
 
 extern struct rtpkt {
   int sourceid;       /* id of sending router sending this pkt */
@@ -81,5 +81,9 @@ void printdt0(struct distance_table *dtptr)
 void linkhandler0(int linkid, int newcost)   
 {
   neighbors[linkid]=newcost;
+  rtinit0();
+  rtinit1();
+  rtinit2();
+  rtinit3();
 }
 
