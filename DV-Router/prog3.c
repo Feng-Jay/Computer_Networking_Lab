@@ -23,17 +23,12 @@ int TRACE = 1;             /* for my debugging */
 int YES = 1;
 int NO = 0;
 
-creatertpkt( initrtpkt, srcid, destid, mincosts)
-struct rtpkt *initrtpkt;
-int srcid;
-int destid;
-int mincosts[];
-
+void creatertpkt(struct rtpkt *initrtpkt,int srcid,int destid,int mincosts[])
 {
   int i;
   initrtpkt->sourceid = srcid;
   initrtpkt->destid = destid;
-  for (i=0; i<4; i++)
+  for (i=0;i<4;i++)
     initrtpkt->mincost[i] = mincosts[i];
 }  
 
@@ -70,7 +65,7 @@ struct event *evlist = NULL;   /* the event list */
 float clocktime = 0.000;
 
 
-main()
+int main()
 {
    struct event *eventptr;
    
@@ -131,7 +126,7 @@ terminate:
 
 
 
-init()                         /* initialize the simulator */
+void init()                         /* initialize the simulator */
 {
   int i;
   float sum, avg;
@@ -183,7 +178,7 @@ init()                         /* initialize the simulator */
 /****************************************************************************/
 float jimsrand() 
 {
-  double mmm = 2147483647;   /* largest int  - MACHINE DEPENDENT!!!!!!!!   */
+  double mmm = 32767;   /* largest int  - MACHINE DEPENDENT!!!!!!!!   */
   float x;                   /* individual students may need to change mmm */ 
   x = rand()/mmm;            /* x should be uniform in [0,1] */
   return(x);
@@ -194,7 +189,7 @@ float jimsrand()
 /*****************************************************/
  
 
-insertevent(p)
+void insertevent(p)
    struct event *p;
 {
    struct event *q,*qold;
@@ -232,7 +227,7 @@ insertevent(p)
          }
 }
 
-printevlist()
+void printevlist()
 {
   struct event *q;
   printf("--------------\nEvent List Follows:\n");

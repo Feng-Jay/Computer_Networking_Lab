@@ -16,25 +16,38 @@ struct distance_table
   int costs[4][4];
 } dt0;
 
-
+int neighbors[4]={0,1,3,7};
 /* students to write the following two routines, and maybe some others */
 
 void rtinit0() 
 {
-
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            dt0.costs[i][j]=999;
+        }
+    }
+    for(int i=0;i<4;i++)
+    dt0.costs[0][i]=neighbors[i];//本地初始化，将0结点直达结点距离设置好，其他先设置为999
+    //开始向直接相连的结点:node1,2,3发送本地初始化内容.
+    for(int i=1;i<4;i++){//向node0的各个邻居发送初始化内容
+      struct rtpkt pkt;
+      pkt.sourceid=0;
+      pkt.destid=i;//发送给1,2,3结点
+      for(int j=0;j<4;j++){
+        pkt.mincost[j]=neighbors[j];
+      }
+      tolayer2(pkt);
+    }
 }
 
 
-void rtupdate0(rcvdpkt)
-  struct rtpkt *rcvdpkt;
+void rtupdate0(struct rtpkt *rcvdpkt)
 {
-
+  
 }
 
 
-printdt0(dtptr)
-  struct distance_table *dtptr;
-  
+void printdt0(struct distance_table *dtptr)
 {
   printf("                via     \n");
   printf("   D0 |    1     2    3 \n");
@@ -47,14 +60,12 @@ printdt0(dtptr)
 	 dtptr->costs[3][2],dtptr->costs[3][3]);
 }
 
-linkhandler0(linkid, newcost)   
-  int linkid, newcost;
-
 /* called when cost from 0 to linkid changes from current value to newcost*/
 /* You can leave this routine empty if you're an undergrad. If you want */
 /* to use this routine, you'll need to change the value of the LINKCHANGE */
 /* constant definition in prog3.c from 0 to 1 */
-	
+void linkhandler0(int linkid, int newcost)   
 {
+
 }
 

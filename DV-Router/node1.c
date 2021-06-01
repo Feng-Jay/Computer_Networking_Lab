@@ -23,21 +23,19 @@ struct distance_table
 /* students to write the following two routines, and maybe some others */
 
 
-rtinit1() 
+void rtinit1() 
 {
 
 }
 
 
-rtupdate1(rcvdpkt)
-  struct rtpkt *rcvdpkt;
-  
+void rtupdate1(struct rtpkt *rcvdpkt)
 {
 
 }
 
 
-printdt1(dtptr)
+void printdt1(dtptr)
   struct distance_table *dtptr;
   
 {
@@ -51,14 +49,11 @@ printdt1(dtptr)
 }
 
 
-
-linkhandler1(linkid, newcost)   
-int linkid, newcost;   
 /* called when cost from 1 to linkid changes from current value to newcost*/
 /* You can leave this routine empty if you're an undergrad. If you want */
 /* to use this routine, you'll need to change the value of the LINKCHANGE */
 /* constant definition in prog3.c from 0 to 1 */
-	
+void linkhandler1(int linkid,int newcost)     
 {
 }
 

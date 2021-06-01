@@ -23,17 +23,13 @@ void rtinit3()
 }
 
 
-void rtupdate3(rcvdpkt)
-  struct rtpkt *rcvdpkt;
-  
+void rtupdate3(struct rtpkt *rcvdpkt) 
 {
 
 }
 
 
-printdt3(dtptr)
-  struct distance_table *dtptr;
-  
+void printdt3(struct distance_table *dtptr)
 {
   printf("             via     \n");
   printf("   D3 |    0     2 \n");
