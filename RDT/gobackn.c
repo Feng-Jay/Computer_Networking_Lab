@@ -159,11 +159,9 @@ void B_input(struct pkt packet)
   judge+=packet.acknum;
   memset(Bsend_PKT.payload,0,sizeof(char)*20);
 
-  if(judge!=packet.checksum||packet.seqnum!=expect_b){
-    //B接收的数据损坏，或者出现冗余，则不向上传递，向A发送NAK
-    if(judge!=packet.checksum)
+  if(judge!=packet.checksum){
+    //B接收的数据损坏，或者出现乱序，则不向上传递，向A发送NAK
     printf("B recv error pkt\n");
-    else printf("B recv disorder pkt\n");
     Bsend_PKT.acknum=NAK;
     Bsend_PKT.seqnum=expect_b;
     //计算校验和
@@ -175,7 +173,7 @@ void B_input(struct pkt packet)
     Bsend_PKT.checksum+=Bsend_PKT.seqnum;
     //包处理完毕，向A发送回去
     tolayer3(1,Bsend_PKT);
-  }else{
+  }else if(packet.seqnum==expect_b){
     //B接收数据正常,将包中对应数据段copy，向上层传递,向A发送ACK;
     memcpy(Brecv_MSG.data,packet.payload,sizeof(char)*20);
     tolayer5(1,Brecv_MSG.data);
@@ -191,6 +189,18 @@ void B_input(struct pkt packet)
     Bsend_PKT.checksum+=Bsend_PKT.seqnum;
     //完毕，准备发送
     expect_b++;//每次都要重新计算B现在需要哪个数据包
+    tolayer3(1,Bsend_PKT);
+  }else{//如果出现乱序
+    printf("B recv disorder okt\n");
+    Bsend_PKT.acknum=ACK;
+    Bsend_PKT.seqnum=packet.seqnum;
+    //计算校验和
+    Bsend_PKT.checksum=0;
+    for(int i=0;i<20;i++){
+      Bsend_PKT.checksum+=Bsend_PKT.payload[i];
+    }
+    Bsend_PKT.checksum+=Bsend_PKT.acknum;
+    Bsend_PKT.checksum+=Bsend_PKT.seqnum;
     tolayer3(1,Bsend_PKT);
   }
 }
