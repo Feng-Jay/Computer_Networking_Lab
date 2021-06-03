@@ -29,6 +29,28 @@ struct msg {
   char data[20];
   };
 
+struct event {
+   float evtime;           /* event time */
+   int evtype;             /* event type code */
+   int eventity;           /* entity where event occurs */
+   struct pkt *pktptr;     /* ptr to packet (if any) assoc w/ this event */
+   struct event *prev;
+   struct event *next;
+ };
+struct event *evlist = NULL;   /* the event list */
+
+/* possible events: */
+#define  TIMER_INTERRUPT 0  
+#define  FROM_LAYER5     1
+#define  FROM_LAYER3     2
+
+#define  OFF             0
+#define  ON              1
+#define   A    0
+#define   B    1
+
+
+
 /* a packet is the data unit passed from layer 4 (students code) to layer */
 /* 3 (teachers code).  Note the pre-defined packet structure, which all   */
 /* students must follow. */
@@ -234,28 +256,6 @@ OF THE DATA STRUCTURES BELOW.  If you're interested in how I designed
 the emulator, you're welcome to look at the code - but again, you should have
 to, and you defeinitely should not have to modify
 ******************************************************************/
-
-struct event {
-   float evtime;           /* event time */
-   int evtype;             /* event type code */
-   int eventity;           /* entity where event occurs */
-   struct pkt *pktptr;     /* ptr to packet (if any) assoc w/ this event */
-   struct event *prev;
-   struct event *next;
- };
-struct event *evlist = NULL;   /* the event list */
-
-/* possible events: */
-#define  TIMER_INTERRUPT 0  
-#define  FROM_LAYER5     1
-#define  FROM_LAYER3     2
-
-#define  OFF             0
-#define  ON              1
-#define   A    0
-#define   B    1
-
-
 
 int TRACE = 1;             /* for my debugging */
 int nsim = 0;              /* number of messages from 5 to 4 so far */ 

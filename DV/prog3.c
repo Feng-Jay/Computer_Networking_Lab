@@ -1,4 +1,14 @@
-#include <router.h>
+#include "router.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+int TRACE = 1;             /* for my debugging */
+int YES = 1;
+int NO = 0;
+
+int min(int a, int b) {
+  return a<b ? a : b;
+}
 
 void creatertpkt(struct rtpkt *initrtpkt,int srcid,int destid,int mincosts[])
 {
@@ -25,14 +35,6 @@ the emulator, you're welcome to look at the code - but again, you should have
 to, and you defeinitely should not have to modify
 ******************************************************************/
 
-struct event {
-   float evtime;           /* event time */
-   int evtype;             /* event type code */
-   int eventity;           /* entity where event occurs */
-   struct rtpkt *rtpktptr; /* ptr to packet (if any) assoc w/ this event */
-   struct event *prev;
-   struct event *next;
-};
 struct event *evlist = NULL;   /* the event list */
 
 /* possible events: */
@@ -122,7 +124,7 @@ void init()                         /* initialize the simulator */
     printf("It is likely that random number generation on your machine\n" ); 
     printf("is different from what this emulator expects.  Please take\n");
     printf("a look at the routine jimsrand() in the emulator code. Sorry. \n");
-    exit();
+    exit(0);
     }
 
    clocktime=0.0;                /* initialize time to 0.0 */

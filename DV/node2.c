@@ -1,15 +1,6 @@
-#include <router.h>
-
-extern struct rtpkt {
-  int sourceid;       /* id of sending router sending this pkt */
-  int destid;         /* id of router to which pkt being sent 
-                         (must be an immediate neighbor) */
-  int mincost[4];    /* min cost to node 0 ... 3 */
-  };
-
-extern int TRACE;
-extern int YES;
-extern int NO;
+#include "router.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 struct distance_table 
 {
@@ -17,7 +8,7 @@ struct distance_table
 } dt2;
 
 
-int neighbors[4]={3,1,0,2};
+int neighbors2[4]={3,1,0,2};
 /* students to write the following two routines, and maybe some others */
 
 void rtinit2() 
@@ -27,11 +18,11 @@ void rtinit2()
     dt2.costs[i][j]=999;
   }
   for(int i=0;i<4;i++){
-    dt2.costs[2][i]=neighbors[i];
+    dt2.costs[2][i]=neighbors2[i];
   }
 
   for(int i=0;i<4;i++){
-    if(neighbors[i]!=999&&i!=2){
+    if(neighbors2[i]!=999&&i!=2){
       struct rtpkt pkt;
       pkt.sourceid=2;
       pkt.destid=i;
@@ -44,6 +35,15 @@ void rtinit2()
   return ;
 }
 
+void printdt2(struct distance_table *dtptr)
+{
+  printf("This is %d to other nodes' distances.\n", 2);
+  printf("---------------------------------------\n");
+  printf("Node|- 0 ----- 1 ------ 2 ----- 3 ----------\n");
+  printf("D%d  |  %d       %d        %d       %d         \n", 2,
+  dtptr->costs[2][0], dtptr->costs[2][1], 
+  dtptr->costs[2][2], dtptr->costs[2][3]);
+}
 
 void rtupdate2(struct rtpkt *rcvdpkt)
 {
@@ -54,7 +54,7 @@ void rtupdate2(struct rtpkt *rcvdpkt)
     }
   }
   for(int i=0;i<4;i++){
-    if(neighbors[i]!=999&&i!=2){
+    if(neighbors2[i]!=999&&i!=2){
       struct rtpkt pkt;
       pkt.sourceid=2;
       pkt.destid=i;
@@ -64,22 +64,12 @@ void rtupdate2(struct rtpkt *rcvdpkt)
       tolayer2(pkt);
     }
   }
+  printdt2(&dt2);
   return ;
 }
 
 
-void printdt2(struct distance_table *dtptr)
-{
-  printf("                via     \n");
-  printf("   D2 |    0     1    3 \n");
-  printf("  ----|-----------------\n");
-  printf("     0|  %3d   %3d   %3d\n",dtptr->costs[0][0],
-	 dtptr->costs[0][1],dtptr->costs[0][3]);
-  printf("dest 1|  %3d   %3d   %3d\n",dtptr->costs[1][0],
-	 dtptr->costs[1][1],dtptr->costs[1][3]);
-  printf("     3|  %3d   %3d   %3d\n",dtptr->costs[3][0],
-	 dtptr->costs[3][1],dtptr->costs[3][3]);
-}
+
 
 
 

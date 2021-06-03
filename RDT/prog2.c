@@ -1,6 +1,25 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+struct event {
+   float evtime;           /* event time */
+   int evtype;             /* event type code */
+   int eventity;           /* entity where event occurs */
+   struct pkt *pktptr;     /* ptr to packet (if any) assoc w/ this event */
+   struct event *prev;
+   struct event *next;
+ };
+struct event *evlist = NULL;   /* the event list */
+
+/* possible events: */
+#define  TIMER_INTERRUPT 0  
+#define  FROM_LAYER5     1
+#define  FROM_LAYER3     2
+
+#define  OFF             0
+#define  ON              1
+#define   A    0
+#define   B    1
 
 /* ******************************************************************
  ALTERNATING BIT AND GO-BACK-N NETWORK EMULATOR: VERSION 1.1  J.F.Kurose
@@ -214,25 +233,25 @@ the emulator, you're welcome to look at the code - but again, you should have
 to, and you defeinitely should not have to modify
 ******************************************************************/
 
-struct event {
-   float evtime;           /* event time */
-   int evtype;             /* event type code */
-   int eventity;           /* entity where event occurs */
-   struct pkt *pktptr;     /* ptr to packet (if any) assoc w/ this event */
-   struct event *prev;
-   struct event *next;
- };
-struct event *evlist = NULL;   /* the event list */
+// struct event {
+//    float evtime;           /* event time */
+//    int evtype;             /* event type code */
+//    int eventity;           /* entity where event occurs */
+//    struct pkt *pktptr;     /* ptr to packet (if any) assoc w/ this event */
+//    struct event *prev;
+//    struct event *next;
+//  };
+// struct event *evlist = NULL;   /* the event list */
 
-/* possible events: */
-#define  TIMER_INTERRUPT 0  
-#define  FROM_LAYER5     1
-#define  FROM_LAYER3     2
+// /* possible events: */
+// #define  TIMER_INTERRUPT 0  
+// #define  FROM_LAYER5     1
+// #define  FROM_LAYER3     2
 
-#define  OFF             0
-#define  ON              1
-#define   A    0
-#define   B    1
+// #define  OFF             0
+// #define  ON              1
+// #define   A    0
+// #define   B    1
 
 
 

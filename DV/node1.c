@@ -1,16 +1,6 @@
-#include <router.h>
-
-extern struct rtpkt {
-  int sourceid;       /* id of sending router sending this pkt */
-  int destid;         /* id of router to which pkt being sent 
-                         (must be an immediate neighbor) */
-  int mincost[4];    /* min cost to node 0 ... 3 */
-};
-
-
-extern int TRACE;
-extern int YES;
-extern int NO;
+#include "router.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 int connectcosts1[4] = { 1,  0,  1, 999 };
 
@@ -21,7 +11,7 @@ struct distance_table
 
 
 
-int neighbors[4]={1,0,1,999};
+int neighbors1[4]={1,0,1,999};
 /* students to write the following two routines, and maybe some others */
 void rtinit1() 
 {
@@ -30,11 +20,11 @@ void rtinit1()
       dt1.costs[i][j]=999;
   }
   for(int i=0;i<4;i++){
-    dt1.costs[1][i]=neighbors[i];
+    dt1.costs[1][i]=neighbors1[i];
   }
 
   for(int i=0;i<4;i++){
-    if(neighbors[i]!=999&&i!=1){
+    if(neighbors1[i]!=999&&i!=1){
       struct rtpkt pkt;
       pkt.sourceid=1;
       pkt.destid=i;
@@ -47,9 +37,18 @@ void rtinit1()
   return ;
 }
 
-
+void printdt1(struct distance_table *dtptr)
+{
+  printf("This is %d to other nodes' distances.\n", 1);
+  printf("---------------------------------------\n");
+  printf("Node|- 0 ----- 1 ------ 2 ----- 3 ----------\n");
+  printf("D%d  |  %d       %d        %d       %d         \n", 1,
+  dtptr->costs[1][0], dtptr->costs[1][1], 
+  dtptr->costs[1][2], dtptr->costs[1][3]);
+}
 void rtupdate1(struct rtpkt *rcvdpkt)
 {
+
   int sourceid=rcvdpkt->sourceid;
   for(int i=0;i<4;i++){
     for(int j=0;j<4;j++){
@@ -57,7 +56,7 @@ void rtupdate1(struct rtpkt *rcvdpkt)
     }
   }
   for(int i=0;i<4;i++){
-    if(neighbors[i]!=999&&i!=1){
+    if(neighbors1[i]!=999&&i!=1){
       struct rtpkt pkt;
       pkt.sourceid=1;
       pkt.destid=i;
@@ -67,22 +66,12 @@ void rtupdate1(struct rtpkt *rcvdpkt)
       tolayer2(pkt);
     }
   }
+   printdt1(&dt1);
   return ;
 }
 
 
-void printdt1(dtptr)
-  struct distance_table *dtptr;
-  
-{
-  printf("             via   \n");
-  printf("   D1 |    0     2 \n");
-  printf("  ----|-----------\n");
-  printf("     0|  %3d   %3d\n",dtptr->costs[0][0], dtptr->costs[0][2]);
-  printf("dest 2|  %3d   %3d\n",dtptr->costs[2][0], dtptr->costs[2][2]);
-  printf("     3|  %3d   %3d\n",dtptr->costs[3][0], dtptr->costs[3][2]);
 
-}
 
 
 /* called when cost from 1 to linkid changes from current value to newcost*/
@@ -91,6 +80,11 @@ void printdt1(dtptr)
 /* constant definition in prog3.c from 0 to 1 */
 void linkhandler1(int linkid,int newcost)     
 {
+  neighbors1[linkid]=newcost;
+  rtinit0();
+  rtinit1();
+  rtinit2();
+  rtinit3();
 }
 
 
